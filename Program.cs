@@ -2,13 +2,16 @@ global using webapi.Models;
 global using webapi.Services.CharacterService;
 global using webapi.Dtos.Character;
 global using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.EntityFrameworkCore;
+global using webapi.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddDbContext<DataContext>(options =>
+options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -475,3 +475,33 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# SQLite database files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+*.db-wal
+*.db-shm
+
+# Entity Framework Core Migrations
+Migrations/*
+Migrations/*.cs
+Migrations/*.Designer.cs
+Migrations/*.resx

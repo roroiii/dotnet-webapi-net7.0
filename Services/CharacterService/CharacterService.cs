@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using webapi.Models;
+
 
 namespace webapi.Services.CharacterService
 {
@@ -26,9 +21,12 @@ namespace webapi.Services.CharacterService
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
             var character = _mapper.Map<Character>(newCharacter);
-            character.Id = characters.Max(c => c.Id) + 1;
-            characters.Add(character);
-            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
+
+            _context.Characters.Add(character);
+            await _context.SaveChangesAsync();
+
+            serviceResponse.Data = await _context.Characters.Where(c => c.Id == character.Id).Select(c => _mapper.Map<GetCharacterDto>(c)).ToListAsync();
+
             return serviceResponse;
         }
 
@@ -38,13 +36,14 @@ namespace webapi.Services.CharacterService
             try
             {
 
-                var character = characters.First(c => c.Id == id);
+                var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == id);
                 if (character == null)
                     throw new Exception($"Character with Id '{id}' not found.");
 
-                characters.Remove(character);
+                _context.Characters.Remove(character);
+                await _context.SaveChangesAsync();
 
-                serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
+                serviceResponse.Data = await _context.Characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -76,11 +75,9 @@ namespace webapi.Services.CharacterService
             try
             {
 
-                var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+                var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id);
                 if (character == null)
                     throw new Exception($"Character with Id '{updatedCharacter.Id}' not found.");
-
-                _mapper.Map(updatedCharacter, character); // (source, destination)    
 
                 character.Name = updatedCharacter.Name;
                 character.HitPoints = updatedCharacter.HitPoints;
@@ -89,6 +86,7 @@ namespace webapi.Services.CharacterService
                 character.Intelligence = updatedCharacter.Intelligence;
                 character.Class = updatedCharacter.Class;
 
+                await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetCharacterDto>(character);
             }
             catch (Exception ex)
